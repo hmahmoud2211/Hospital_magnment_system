@@ -1,0 +1,122 @@
+<Page x:Class="Hospital_magnment_system.Views.Reports"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Reports">
+    
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Text="Reports" 
+                  FontSize="24" FontWeight="Bold" 
+                  Margin="0,0,0,20"/>
+
+        <!-- Report Options -->
+        <StackPanel Grid.Row="1" Margin="0,0,0,20">
+            <!-- Financial Reports -->
+            <GroupBox Header="Financial Reports" Margin="0,0,0,10">
+                <StackPanel>
+                    <RadioButton x:Name="btnRevenueSummary" 
+                               Content="Revenue Summary" 
+                               Margin="0,5"
+                               GroupName="ReportType"
+                               Checked="ReportType_Changed"/>
+                    
+                    <RadioButton x:Name="btnBillingStatus" 
+                               Content="Billing Status" 
+                               Margin="0,5"
+                               GroupName="ReportType"
+                               Checked="ReportType_Changed"/>
+                    
+                    <RadioButton x:Name="btnOutstandingPayments" 
+                               Content="Outstanding Payments" 
+                               Margin="0,5"
+                               GroupName="ReportType"
+                               Checked="ReportType_Changed"/>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Operational Reports -->
+            <GroupBox Header="Operational Reports" Margin="0,0,0,10">
+                <StackPanel>
+                    <RadioButton x:Name="btnRoomOccupancy" 
+                               Content="Room Occupancy" 
+                               Margin="0,5"
+                               GroupName="ReportType"
+                               Checked="ReportType_Changed"/>
+                    
+                    <RadioButton x:Name="btnPatientStatistics" 
+                               Content="Patient Statistics" 
+                               Margin="0,5"
+                               GroupName="ReportType"
+                               Checked="ReportType_Changed"/>
+                    
+                    <RadioButton x:Name="btnDoctorPerformance" 
+                               Content="Doctor Performance" 
+                               Margin="0,5"
+                               GroupName="ReportType"
+                               Checked="ReportType_Changed"/>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Date Range -->
+            <GroupBox Header="Date Range" Margin="0,0,0,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="From:" 
+                             VerticalAlignment="Center" 
+                             Margin="0,0,10,0"/>
+                    <DatePicker x:Name="dpStartDate" 
+                              Grid.Column="1" 
+                              Margin="0,5"/>
+                    
+                    <TextBlock Text="To:" 
+                             Grid.Column="2" 
+                             VerticalAlignment="Center" 
+                             Margin="10,0"/>
+                    <DatePicker x:Name="dpEndDate" 
+                              Grid.Column="3" 
+                              Margin="0,5"/>
+                </Grid>
+            </GroupBox>
+
+            <Button Content="Generate Report" 
+                    Width="150" 
+                    HorizontalAlignment="Left"
+                    Background="#2ecc71" 
+                    Foreground="White"
+                    Click="btnGenerateReport_Click"/>
+        </StackPanel>
+
+        <!-- Report Data -->
+        <DataGrid x:Name="dgReportData" 
+                  Grid.Row="2" 
+                  AutoGenerateColumns="True"
+                  IsReadOnly="True"
+                  Margin="0,0,0,20"/>
+
+        <!-- Export Options -->
+        <StackPanel Grid.Row="3" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right">
+            <Button Content="Export to Excel" 
+                    Width="120" 
+                    Margin="0,0,10,0"
+                    Click="btnExportToExcel_Click"/>
+            <Button Content="Export to PDF" 
+                    Width="120"
+                    Click="btnExportToPDF_Click"/>
+        </StackPanel>
+    </Grid>
+</Page> 
