@@ -22,7 +22,7 @@ namespace Hospital_magnment_system.Views
         {
             try
             {
-                // Set up event handlers after controls are initialized
+                // Set up event handlers
                 dpStartDate.SelectedDateChanged += DateRange_Changed;
                 dpEndDate.SelectedDateChanged += DateRange_Changed;
                 cmbStatus.SelectionChanged += Filter_Changed;
@@ -49,28 +49,24 @@ namespace Hospital_magnment_system.Views
                 using (var conn = DatabaseConnection.GetConnection())
                 {
                     conn.Open();
+                    // Simplified query for testing
                     string query = @"SELECT 
-                                   b.BillNumber as 'Bill #',
-                                   DATE_FORMAT(b.BillDate, '%Y-%m-%d') as Date,
-                                   CONCAT(p.FirstName, ' ', p.LastName) as Patient,
-                                   (b.RoomCharges + b.MedicineCharges + b.DoctorFees + b.OtherCharges) as 'Total Amount',
-                                   b.Status,
-                                   b.BillNumber as BillID
+                                   b.*, 
+                                   CONCAT(p.FirstName, ' ', p.LastName) as PatientName
                                    FROM Bills b
-                                   INNER JOIN Patients p ON b.PatientID = p.PatientID
-                                   WHERE DATE(b.BillDate) BETWEEN @StartDate AND @EndDate
-                                   AND (@Status = 'All' OR b.Status = @Status)
-                                   ORDER BY b.BillDate DESC";
+                                   INNER JOIN Patients p ON b.PatientID = p.PatientID";
 
                     using (var cmd = new MySqlCommand(query, conn))
                     {
-                        cmd.Parameters.AddWithValue("@StartDate", dpStartDate.SelectedDate?.Date ?? DateTime.Today);
-                        cmd.Parameters.AddWithValue("@EndDate", dpEndDate.SelectedDate?.Date ?? DateTime.Today);
-                        cmd.Parameters.AddWithValue("@Status", cmbStatus.SelectedValue?.ToString() ?? "All");
-
                         var adapter = new MySqlDataAdapter(cmd);
                         var dt = new DataTable();
                         adapter.Fill(dt);
+
+                        // Debug information
+                        MessageBox.Show($"Date Range: {dpStartDate.SelectedDate:dd/MM/yyyy} to {dpEndDate.SelectedDate:dd/MM/yyyy}\n" +
+                                      $"Status Filter: {cmbStatus.SelectedValue?.ToString() ?? "All"}\n" +
+                                      $"Found {dt.Rows.Count} bills");
+
                         dgBills.ItemsSource = dt.DefaultView;
                     }
                 }
@@ -91,15 +87,16 @@ namespace Hospital_magnment_system.Views
                     string query = @"SELECT 
                                    b.BillNumber,
                                    b.BillDate,
-                                   CONCAT(p.FirstName, ' ', p.LastName) as PatientName,
                                    b.RoomCharges,
                                    b.MedicineCharges,
                                    b.DoctorFees,
                                    b.OtherCharges,
-                                   (b.RoomCharges + b.MedicineCharges + b.DoctorFees + b.OtherCharges) as TotalAmount,
-                                   b.Status
+                                   b.Status,
+                                   CONCAT(p.FirstName, ' ', p.LastName) as PatientName,
+                                   p.Phone, 
+                                   p.Address
                                    FROM Bills b
-                                   INNER JOIN Patients p ON b.PatientID = p.PatientID
+                                   JOIN Patients p ON b.PatientID = p.PatientID
                                    WHERE b.BillNumber = @BillNumber";
 
                     using (var cmd = new MySqlCommand(query, conn))
@@ -109,13 +106,19 @@ namespace Hospital_magnment_system.Views
                         {
                             if (reader.Read())
                             {
+                                // Update bill details panel
                                 txtPatientName.Text = reader["PatientName"].ToString();
-                                txtBillDate.Text = Convert.ToDateTime(reader["BillDate"]).ToString("MM/dd/yyyy");
+                                txtBillDate.Text = Convert.ToDateTime(reader["BillDate"]).ToString("dd/MM/yyyy");
                                 txtRoomCharges.Text = string.Format("{0:C2}", reader["RoomCharges"]);
                                 txtMedicineCharges.Text = string.Format("{0:C2}", reader["MedicineCharges"]);
                                 txtDoctorFees.Text = string.Format("{0:C2}", reader["DoctorFees"]);
                                 txtOtherCharges.Text = string.Format("{0:C2}", reader["OtherCharges"]);
-                                txtTotalAmount.Text = string.Format("{0:C2}", reader["TotalAmount"]);
+                                
+                                decimal totalAmount = Convert.ToDecimal(reader["RoomCharges"]) +
+                                                   Convert.ToDecimal(reader["MedicineCharges"]) +
+                                                   Convert.ToDecimal(reader["DoctorFees"]) +
+                                                   Convert.ToDecimal(reader["OtherCharges"]);
+                                txtTotalAmount.Text = string.Format("{0:C2}", totalAmount);
 
                                 // Enable/disable Mark as Paid button based on status
                                 btnMarkAsPaid.IsEnabled = reader["Status"].ToString() == "Pending";
@@ -144,52 +147,37 @@ namespace Hospital_magnment_system.Views
 
         private void DateRange_Changed(object sender, SelectionChangedEventArgs e)
         {
-            if (!IsInitialized || sender == null) return;
-            
-            if (dpStartDate?.SelectedDate != null && dpEndDate?.SelectedDate != null)
-            {
-                LoadBills();
-            }
+            LoadBills();
         }
 
         private void Filter_Changed(object sender, SelectionChangedEventArgs e)
         {
-            if (!IsInitialized || sender == null) return;
-            
-            if (cmbStatus?.SelectedItem != null)
-            {
-                LoadBills();
-            }
+            LoadBills();
         }
 
         private void dgBills_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            try
+            var selectedBill = dgBills.SelectedItem as DataRowView;
+            if (selectedBill != null)
             {
-                var selectedBill = dgBills.SelectedItem as DataRowView;
-                if (selectedBill != null)
-                {
-                    // Get the bill number from the selected row
-                    string billNumber = selectedBill["Bill #"].ToString();
-                    LoadBillDetails(billNumber);
-                }
-                else
-                {
-                    ClearBillDetails();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error loading bill details: " + ex.Message);
+                LoadBillDetails(selectedBill["BillNumber"].ToString());
             }
         }
 
         private void btnNewBill_Click(object sender, RoutedEventArgs e)
         {
-            var addBillWindow = new AddBillWindow();
-            if (addBillWindow.ShowDialog() == true)
+            try
             {
-                LoadBills();
+                var addBillWindow = new AddBillWindow();
+                if (addBillWindow.ShowDialog() == true)
+                {
+                    LoadBills(); // Refresh the grid after adding a new bill
+                    ClearBillDetails(); // Clear the details panel
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error creating new bill: " + ex.Message);
             }
         }
 
@@ -220,26 +208,30 @@ namespace Hospital_magnment_system.Views
                 var selectedBill = dgBills.SelectedItem as DataRowView;
                 if (selectedBill == null) return;
 
-                string billNumber = selectedBill["Bill #"].ToString();
+                string billNumber = selectedBill["BillNumber"].ToString();
 
-                using (var conn = DatabaseConnection.GetConnection())
+                if (MessageBox.Show("Are you sure you want to mark this bill as paid?", 
+                    "Confirm", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 {
-                    conn.Open();
-                    string query = "UPDATE Bills SET Status = 'Paid' WHERE BillNumber = @BillNumber";
-
-                    using (var cmd = new MySqlCommand(query, conn))
+                    using (var conn = DatabaseConnection.GetConnection())
                     {
-                        cmd.Parameters.AddWithValue("@BillNumber", billNumber);
-                        cmd.ExecuteNonQuery();
-                    }
-                }
+                        conn.Open();
+                        string query = "UPDATE Bills SET Status = 'Paid' WHERE BillNumber = @BillNumber";
 
-                MessageBox.Show("Bill marked as paid successfully!");
-                LoadBills(); // Refresh the grid
-                LoadBillDetails(billNumber); // Refresh details
+                        using (var cmd = new MySqlCommand(query, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@BillNumber", billNumber);
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+
+                    MessageBox.Show("Bill marked as paid successfully!");
+                    LoadBills(); // Refresh the grid
+                    LoadBillDetails(billNumber); // Refresh details
                 }
-                catch (Exception ex)
-                {
+            }
+            catch (Exception ex)
+            {
                 MessageBox.Show("Error marking bill as paid: " + ex.Message);
             }
         }

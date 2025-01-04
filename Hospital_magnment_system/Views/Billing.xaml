@@ -6,11 +6,11 @@
     <Grid Margin="20">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="20"/>
             <ColumnDefinition Width="300"/>
         </Grid.ColumnDefinitions>
-        
-        <Grid>
+
+        <!-- Left Panel -->
+        <Grid Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -22,58 +22,60 @@
                       FontSize="24" FontWeight="Bold" 
                       Margin="0,0,0,20"/>
 
-            <!-- Search and Filter Controls -->
-            <WrapPanel Grid.Row="1" Margin="0,0,0,20">
-                <StackPanel Margin="0,0,20,0">
-                    <TextBlock Text="Date Range"/>
-                    <StackPanel Orientation="Horizontal">
-                        <DatePicker x:Name="dpStartDate" Width="150" 
-                                  Margin="0,5,10,0"/>
-                        <TextBlock Text="to" VerticalAlignment="Center" 
-                                 Margin="0,5,10,0"/>
-                        <DatePicker x:Name="dpEndDate" Width="150" 
-                                  Margin="0,5,0,0"/>
+            <!-- Controls -->
+            <StackPanel Grid.Row="1" Margin="0,0,0,20">
+                <WrapPanel>
+                    <StackPanel Margin="0,0,20,0">
+                        <TextBlock Text="Date Range"/>
+                        <StackPanel Orientation="Horizontal">
+                            <DatePicker x:Name="dpStartDate" Width="150"/>
+                            <TextBlock Text="to" Margin="10,0"/>
+                            <DatePicker x:Name="dpEndDate" Width="150"/>
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
 
-                <StackPanel Margin="0,0,20,0">
-                    <TextBlock Text="Status"/>
-                    <ComboBox x:Name="cmbStatus" Width="150" 
-                             Margin="0,5,0,0">
-                        <ComboBoxItem Content="All"/>
-                        <ComboBoxItem Content="Pending"/>
-                        <ComboBoxItem Content="Paid"/>
-                        <ComboBoxItem Content="Cancelled"/>
-                    </ComboBox>
-                </StackPanel>
+                    <StackPanel Margin="0,0,20,0">
+                        <TextBlock Text="Status"/>
+                        <ComboBox x:Name="cmbStatus" Width="150">
+                            <ComboBoxItem Content="All"/>
+                            <ComboBoxItem Content="Pending"/>
+                            <ComboBoxItem Content="Paid"/>
+                            <ComboBoxItem Content="Cancelled"/>
+                        </ComboBox>
+                    </StackPanel>
 
-                <StackPanel VerticalAlignment="Bottom">
-                    <Button x:Name="btnNewBill" 
-                            Content="Create New Bill" 
-                            Width="150" Height="30"
+                    <Button Content="Create New Bill" 
+                            Width="120" Height="30"
                             Background="#2ecc71" 
                             Foreground="White"
                             Click="btnNewBill_Click"/>
-                </StackPanel>
-            </WrapPanel>
+                </WrapPanel>
+            </StackPanel>
 
             <!-- Bills DataGrid -->
-            <DataGrid Grid.Row="2" x:Name="dgBills" 
+            <DataGrid Grid.Row="2" 
+                      x:Name="dgBills" 
                       AutoGenerateColumns="False" 
                       IsReadOnly="True"
-                      SelectionMode="Single">
+                      SelectionMode="Single"
+                      SelectionChanged="dgBills_SelectionChanged">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Bill #" 
-                                      Binding="{Binding BillNumber}"/>
+                                      Binding="{Binding BillNumber}" 
+                                      Width="Auto"/>
                     <DataGridTextColumn Header="Date" 
-                                      Binding="{Binding BillDate, StringFormat={}{0:dd/MM/yyyy}}"/>
+                                      Binding="{Binding BillDate, StringFormat=dd/MM/yyyy}" 
+                                      Width="Auto"/>
                     <DataGridTextColumn Header="Patient" 
-                                      Binding="{Binding PatientName}"/>
+                                      Binding="{Binding PatientName}" 
+                                      Width="*"/>
                     <DataGridTextColumn Header="Total Amount" 
-                                      Binding="{Binding TotalAmount, StringFormat=C2}"/>
+                                      Binding="{Binding TotalAmount, StringFormat=C2}" 
+                                      Width="Auto"/>
                     <DataGridTextColumn Header="Status" 
-                                      Binding="{Binding Status}"/>
-                    <DataGridTemplateColumn Header="Actions">
+                                      Binding="{Binding Status}" 
+                                      Width="Auto"/>
+                    <DataGridTemplateColumn Header="Actions" Width="Auto">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -81,7 +83,6 @@
                                             Margin="0,0,5,0"
                                             Click="btnView_Click"/>
                                     <Button Content="Print" 
-                                            Margin="0,0,5,0"
                                             Click="btnPrint_Click"/>
                                 </StackPanel>
                             </DataTemplate>
@@ -92,66 +93,53 @@
         </Grid>
 
         <!-- Bill Details Panel -->
-        <Border Grid.Column="2" 
-                Background="White" 
-                BorderBrush="#ddd" 
-                BorderThickness="1"
-                Padding="15">
-            <StackPanel>
-                <TextBlock Text="Bill Details" 
-                          FontSize="18" 
-                          FontWeight="Bold" 
-                          Margin="0,0,0,20"/>
-
+        <GroupBox Grid.Column="1" 
+                 Header="Bill Details" 
+                 Margin="20,0,0,0">
+            <StackPanel Margin="10">
                 <TextBlock Text="Patient Information"/>
                 <TextBlock x:Name="txtPatientName" 
                          Text="-" 
-                         FontWeight="Bold"
-                         Margin="0,5,0,15"/>
-
+                         Margin="0,0,0,10"/>
+                
                 <TextBlock Text="Bill Date"/>
                 <TextBlock x:Name="txtBillDate" 
                          Text="-" 
-                         Margin="0,5,0,15"/>
-
+                         Margin="0,0,0,10"/>
+                
                 <TextBlock Text="Room Charges"/>
                 <TextBlock x:Name="txtRoomCharges" 
                          Text="-" 
-                         Margin="0,5,0,15"/>
-
+                         Margin="0,0,0,10"/>
+                
                 <TextBlock Text="Medicine Charges"/>
                 <TextBlock x:Name="txtMedicineCharges" 
                          Text="-" 
-                         Margin="0,5,0,15"/>
-
+                         Margin="0,0,0,10"/>
+                
                 <TextBlock Text="Doctor Fees"/>
                 <TextBlock x:Name="txtDoctorFees" 
                          Text="-" 
-                         Margin="0,5,0,15"/>
-
+                         Margin="0,0,0,10"/>
+                
                 <TextBlock Text="Other Charges"/>
                 <TextBlock x:Name="txtOtherCharges" 
                          Text="-" 
-                         Margin="0,5,0,15"/>
-
-                <Border BorderBrush="#ddd" 
-                        BorderThickness="0,1,0,0" 
-                        Margin="0,10"/>
-
+                         Margin="0,0,0,10"/>
+                
+                <Separator Margin="0,10"/>
+                
                 <TextBlock Text="Total Amount" FontWeight="Bold"/>
                 <TextBlock x:Name="txtTotalAmount" 
                          Text="-" 
-                         FontWeight="Bold"
-                         Margin="0,5,0,15"/>
-
+                         FontWeight="Bold" 
+                         Margin="0,0,0,10"/>
+                
                 <Button x:Name="btnMarkAsPaid" 
                         Content="Mark as Paid" 
-                        Background="#2ecc71"
-                        Foreground="White"
-                        Height="35"
-                        Click="btnMarkAsPaid_Click"
-                        Visibility="Collapsed"/>
+                        Click="btnMarkAsPaid_Click" 
+                        IsEnabled="False"/>
             </StackPanel>
-        </Border>
+        </GroupBox>
     </Grid>
 </Page> 

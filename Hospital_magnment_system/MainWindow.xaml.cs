@@ -63,11 +63,6 @@ namespace Hospital_magnment_system
             NavigateToPage(btnBilling, new Billing());
         }
 
-        private void btnReports_Click(object sender, RoutedEventArgs e)
-        {
-            NavigateToPage(btnReports, new Reports());
-        }
-
         private void btnSettings_Click(object sender, RoutedEventArgs e)
         {
             NavigateToPage(btnSettings, new Settings());
