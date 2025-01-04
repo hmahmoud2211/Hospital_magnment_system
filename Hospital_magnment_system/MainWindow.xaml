@@ -271,16 +271,6 @@
                         </StackPanel>
                     </Button>
 
-                    <Button x:Name="btnReports" 
-                            Style="{StaticResource MenuButtonStyle}"
-                            Click="btnReports_Click">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="&#xE9F9;" 
-                                     Style="{StaticResource MenuIconStyle}"/>
-                            <TextBlock Text="Reports"/>
-                        </StackPanel>
-                    </Button>
-
                     <Button x:Name="btnSettings" 
                             Style="{StaticResource MenuButtonStyle}"
                             Click="btnSettings_Click">

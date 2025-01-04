@@ -31,12 +31,16 @@ namespace Hospital_magnment_system.Helpers
             {
                 ReportType.RevenueSummary => @"
                     SELECT 
-                        DATE_FORMAT(BillDate, '%Y-%m') as Month,
-                        SUM(TotalAmount) as Revenue,
-                        COUNT(*) as BillCount
-                    FROM Bills
-                    WHERE BillDate BETWEEN @StartDate AND @EndDate
-                    GROUP BY DATE_FORMAT(BillDate, '%Y-%m')
+                        DATE_FORMAT(b.BillDate, '%Y-%m') as Month,
+                        COUNT(*) as BillCount,
+                        SUM(b.RoomCharges) as RoomCharges,
+                        SUM(b.MedicineCharges) as MedicineCharges,
+                        SUM(b.DoctorFees) as DoctorFees,
+                        SUM(b.OtherCharges) as OtherCharges,
+                        SUM(b.RoomCharges + b.MedicineCharges + b.DoctorFees + b.OtherCharges) as TotalRevenue
+                    FROM Bills b
+                    WHERE b.BillDate BETWEEN @StartDate AND @EndDate
+                    GROUP BY DATE_FORMAT(b.BillDate, '%Y-%m')
                     ORDER BY Month",
 
                 ReportType.BillingStatus => @"

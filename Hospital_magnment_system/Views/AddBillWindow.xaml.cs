@@ -336,7 +336,8 @@ namespace Hospital_magnment_system.Views
                     {
                         try
                         {
-                            // Insert bill
+                            string billNumber = GenerateBillNumber();
+                            
                             string billQuery = @"INSERT INTO Bills 
                                 (BillNumber, PatientID, BillDate, RoomCharges, 
                                  MedicineCharges, DoctorFees, OtherCharges, Status) 
@@ -344,11 +345,9 @@ namespace Hospital_magnment_system.Views
                                 (@BillNumber, @PatientID, @BillDate, @RoomCharges,
                                  @MedicineCharges, @DoctorFees, @OtherCharges, 'Pending')";
 
-                            var selectedPatient = (DataRowView)cmbPatient.SelectedItem;
-                            string billNumber = GenerateBillNumber();
-
                             using (var cmd = new MySqlCommand(billQuery, conn, transaction))
                             {
+                                var selectedPatient = (DataRowView)cmbPatient.SelectedItem;
                                 cmd.Parameters.AddWithValue("@BillNumber", billNumber);
                                 cmd.Parameters.AddWithValue("@PatientID", selectedPatient["PatientID"]);
                                 cmd.Parameters.AddWithValue("@BillDate", DateTime.Now);
@@ -356,55 +355,12 @@ namespace Hospital_magnment_system.Views
                                 cmd.Parameters.AddWithValue("@MedicineCharges", _totalMedicineCharges);
                                 cmd.Parameters.AddWithValue("@DoctorFees", _totalDoctorFees);
                                 cmd.Parameters.AddWithValue("@OtherCharges", _totalOtherCharges);
-
+                                
                                 cmd.ExecuteNonQuery();
                             }
 
-                            // Save medicine details if any
-                            if (_medicines.Any())
-                            {
-                                string medicineQuery = @"INSERT INTO BillMedicines 
-                                    (BillNumber, MedicineID, Quantity, PricePerUnit) 
-                                    VALUES 
-                                    (@BillNumber, @MedicineID, @Quantity, @PricePerUnit)";
-
-                                foreach (var medicine in _medicines)
-                                {
-                                    using (var cmd = new MySqlCommand(medicineQuery, conn, transaction))
-                                    {
-                                        cmd.Parameters.AddWithValue("@BillNumber", billNumber);
-                                        cmd.Parameters.AddWithValue("@MedicineID", medicine.MedicineID);
-                                        cmd.Parameters.AddWithValue("@Quantity", medicine.Quantity);
-                                        cmd.Parameters.AddWithValue("@PricePerUnit", medicine.Price);
-                                        cmd.ExecuteNonQuery();
-                                    }
-                                }
-                            }
-
-                            // Save doctor fees if any
-                            if (_doctorFees.Any())
-                            {
-                                string feeQuery = @"INSERT INTO BillDoctorFees 
-                                    (BillNumber, DoctorID, Amount, ServiceDescription, Notes) 
-                                    VALUES 
-                                    (@BillNumber, @DoctorID, @Amount, @ServiceDescription, @Notes)";
-
-                                foreach (var fee in _doctorFees)
-                                {
-                                    using (var cmd = new MySqlCommand(feeQuery, conn, transaction))
-                                    {
-                                        cmd.Parameters.AddWithValue("@BillNumber", billNumber);
-                                        cmd.Parameters.AddWithValue("@DoctorID", fee.DoctorID);
-                                        cmd.Parameters.AddWithValue("@Amount", fee.Amount);
-                                        cmd.Parameters.AddWithValue("@ServiceDescription", fee.ServiceDescription);
-                                        cmd.Parameters.AddWithValue("@Notes", fee.Notes ?? "");
-                                        cmd.ExecuteNonQuery();
-                                    }
-                                }
-                            }
-
                             transaction.Commit();
-                            MessageBox.Show("Bill saved successfully!");
+                            MessageBox.Show($"Bill {billNumber} saved successfully!");
                             DialogResult = true;
                             Close();
                         }
