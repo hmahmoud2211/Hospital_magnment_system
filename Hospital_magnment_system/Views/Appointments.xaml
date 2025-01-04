@@ -1,0 +1,104 @@
+<Page x:Class="Hospital_magnment_system.Views.Appointments"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Appointments">
+    
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Text="Appointments Management" 
+                  FontSize="24" FontWeight="Bold" 
+                  Margin="0,0,0,20"/>
+
+        <!-- Search and Filter Controls -->
+        <WrapPanel Grid.Row="1" Margin="0,0,0,20">
+            <StackPanel Margin="0,0,20,0">
+                <TextBlock Text="Date Range"/>
+                <StackPanel Orientation="Horizontal">
+                    <DatePicker x:Name="dpStartDate" Width="150" 
+                              Margin="0,5,10,0"
+                              SelectedDateChanged="DateRange_Changed"/>
+                    <TextBlock Text="to" VerticalAlignment="Center" 
+                             Margin="0,5,10,0"/>
+                    <DatePicker x:Name="dpEndDate" Width="150" 
+                              Margin="0,5,0,0"
+                              SelectedDateChanged="DateRange_Changed"/>
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Margin="0,0,20,0">
+                <TextBlock Text="Doctor"/>
+                <ComboBox x:Name="cmbDoctor" Width="200" 
+                         Margin="0,5,0,0"
+                         
+                         Tag="Select doctor"
+                         SelectionChanged="Filter_Changed"
+                         DisplayMemberPath="FullName"/>
+            </StackPanel>
+
+            <StackPanel Margin="0,0,20,0">
+                <TextBlock Text="Status"/>
+                <ComboBox x:Name="cmbStatus" Width="150" 
+                         Margin="0,5,0,0"
+                         
+                         Tag="Select status"
+                         SelectionChanged="Filter_Changed">
+                    <ComboBoxItem Content="All"/>
+                    <ComboBoxItem Content="Scheduled"/>
+                    <ComboBoxItem Content="Completed"/>
+                    <ComboBoxItem Content="Cancelled"/>
+                </ComboBox>
+            </StackPanel>
+
+            <StackPanel VerticalAlignment="Bottom">
+                <Button x:Name="btnAddAppointment" 
+                        Content="New Appointment" 
+                        Width="150" Height="30"
+                        Background="#2ecc71" 
+                        Foreground="White"
+                        Click="btnAddAppointment_Click"/>
+            </StackPanel>
+        </WrapPanel>
+
+        <!-- Appointments DataGrid -->
+        <DataGrid Grid.Row="2" x:Name="dgAppointments" 
+                  AutoGenerateColumns="False" 
+                  IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" 
+                                  Binding="{Binding AppointmentID}"/>
+                <DataGridTextColumn Header="Date" 
+                                  Binding="{Binding AppointmentDate, StringFormat={}{0:dd/MM/yyyy HH:mm}}"/>
+                <DataGridTextColumn Header="Patient" 
+                                  Binding="{Binding PatientName}"/>
+                <DataGridTextColumn Header="Doctor" 
+                                  Binding="{Binding DoctorName}"/>
+                <DataGridTextColumn Header="Status" 
+                                  Binding="{Binding Status}"/>
+                <DataGridTemplateColumn Header="Actions">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Edit" 
+                                        Margin="0,0,5,0"
+                                        Click="btnEdit_Click"/>
+                                <Button Content="Complete" 
+                                        Margin="0,0,5,0"
+                                        Click="btnComplete_Click"/>
+                                <Button Content="Cancel" 
+                                        Background="#e74c3c"
+                                        Foreground="White"
+                                        Click="btnCancel_Click"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Page> 

@@ -1,0 +1,64 @@
+<Page x:Class="Hospital_magnment_system.Views.Patients"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Patients">
+    
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Text="Patients Management" 
+                   FontSize="24" FontWeight="Bold" 
+                   Margin="0,0,0,20"/>
+
+        <!-- Search and Add Patient -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" 
+                    Margin="0,0,0,20">
+            <TextBox x:Name="txtSearch" Width="300" 
+                     Margin="0,0,10,0" Padding="5"
+                    />
+            <Button x:Name="btnSearch" Content="Search" 
+                    Width="100" Margin="0,0,10,0"/>
+            <Button x:Name="btnAddPatient" Content="Add New Patient" 
+                    Width="150" Background="#2ecc71" 
+                    Foreground="White" Click="btnAddPatient_Click"/>
+        </StackPanel>
+
+        <!-- Patients DataGrid -->
+        <DataGrid Grid.Row="2" x:Name="dgPatients" 
+                  AutoGenerateColumns="False" 
+                  IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" 
+                                  Binding="{Binding PatientID}"/>
+                <DataGridTextColumn Header="Name" 
+                                  Binding="{Binding FullName}"/>
+                <DataGridTextColumn Header="Gender" 
+                                  Binding="{Binding Gender}"/>
+                <DataGridTextColumn Header="Phone" 
+                                  Binding="{Binding Phone}"/>
+                <DataGridTextColumn Header="Email" 
+                                  Binding="{Binding Email}"/>
+                <DataGridTemplateColumn Header="Actions">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Edit" 
+                                        Margin="0,0,5,0"
+                                        Click="btnEdit_Click"/>
+                                <Button Content="Delete" 
+                                        Background="#e74c3c"
+                                        Foreground="White"
+                                        Click="btnDelete_Click"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Page> 

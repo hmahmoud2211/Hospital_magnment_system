@@ -1,0 +1,72 @@
+<Page x:Class="Hospital_magnment_system.Views.Settings"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Settings">
+    
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Text="Settings" 
+                  FontSize="24" FontWeight="Bold" 
+                  Margin="0,0,0,20"/>
+
+        <!-- Settings Content -->
+        <StackPanel Grid.Row="1" MaxWidth="600" HorizontalAlignment="Left">
+            <!-- Database Settings -->
+            <GroupBox Header="Database Settings" Margin="0,0,0,20">
+                <StackPanel Margin="10">
+                    <TextBlock Text="Server"/>
+                    <TextBox x:Name="txtServer" Margin="0,5,0,10"/>
+
+                    <TextBlock Text="Database"/>
+                    <TextBox x:Name="txtDatabase" Margin="0,5,0,10"/>
+
+                    <TextBlock Text="Username"/>
+                    <TextBox x:Name="txtUsername" Margin="0,5,0,10"/>
+
+                    <TextBlock Text="Password"/>
+                    <PasswordBox x:Name="txtPassword" Margin="0,5,0,10"/>
+
+                    <Button Content="Test Connection" 
+                            Width="150" 
+                            HorizontalAlignment="Left"
+                            Margin="0,10,0,0"
+                            Click="btnTestConnection_Click"/>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- General Settings -->
+            <GroupBox Header="General Settings" Margin="0,0,0,20">
+                <StackPanel Margin="10">
+                    <TextBlock Text="Hospital Name"/>
+                    <TextBox x:Name="txtHospitalName" Margin="0,5,0,10"/>
+
+                    <TextBlock Text="Address"/>
+                    <TextBox x:Name="txtAddress" 
+                            Height="60" 
+                            TextWrapping="Wrap" 
+                            AcceptsReturn="True" 
+                            Margin="0,5,0,10"/>
+
+                    <TextBlock Text="Contact Number"/>
+                    <TextBox x:Name="txtContactNumber" Margin="0,5,0,10"/>
+
+                    <TextBlock Text="Email"/>
+                    <TextBox x:Name="txtEmail" Margin="0,5,0,10"/>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Save Button -->
+            <Button Content="Save Settings" 
+                    Width="150" 
+                    HorizontalAlignment="Left"
+                    Background="#2ecc71" 
+                    Foreground="White"
+                    Click="btnSaveSettings_Click"/>
+        </StackPanel>
+    </Grid>
+</Page> 

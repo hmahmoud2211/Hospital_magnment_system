@@ -1,0 +1,116 @@
+<Window x:Class="HospitalManagement.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Hospital Management System" Height="800" Width="1200"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Menu Panel -->
+        <StackPanel Grid.Column="0" Background="#2c3e50">
+            <Image Source="/Images/hospital_logo.png" Height="100" Margin="20"/>
+            <TextBlock Text="Hospital Management" Foreground="White" 
+                      FontSize="22" Margin="20,0,20,20"
+                      HorizontalAlignment="Center"/>
+            
+            <Button x:Name="btnDashboard" Content="Dashboard" 
+                    Style="{StaticResource MenuButtonStyle}"
+                    Click="btnDashboard_Click">
+                <Button.ContentTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE80F;" FontFamily="Segoe MDL2 Assets" Margin="0,0,10,0"/>
+                            <TextBlock Text="Dashboard"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </Button.ContentTemplate>
+            </Button>
+            
+            <Button x:Name="btnPatients" Content="Patients" 
+                    Style="{StaticResource MenuButtonStyle}"
+                    Click="btnPatients_Click">
+                <Button.ContentTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE77B;" FontFamily="Segoe MDL2 Assets" Margin="0,0,10,0"/>
+                            <TextBlock Text="Patients"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </Button.ContentTemplate>
+            </Button>
+            
+            <Button x:Name="btnDoctors" Content="Doctors" 
+                    Style="{StaticResource MenuButtonStyle}"
+                    Click="btnDoctors_Click">
+                <Button.ContentTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE77B;" FontFamily="Segoe MDL2 Assets" Margin="0,0,10,0"/>
+                            <TextBlock Text="Doctors"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </Button.ContentTemplate>
+            </Button>
+            
+            <Button x:Name="btnAppointments" Content="Appointments" 
+                    Style="{StaticResource MenuButtonStyle}"
+                    Click="btnAppointments_Click">
+                <Button.ContentTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE787;" FontFamily="Segoe MDL2 Assets" Margin="0,0,10,0"/>
+                            <TextBlock Text="Appointments"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </Button.ContentTemplate>
+            </Button>
+            
+            <Button x:Name="btnRooms" Content="Rooms" 
+                    Style="{StaticResource MenuButtonStyle}"
+                    Click="btnRooms_Click">
+                <Button.ContentTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE8F1;" FontFamily="Segoe MDL2 Assets" Margin="0,0,10,0"/>
+                            <TextBlock Text="Rooms"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </Button.ContentTemplate>
+            </Button>
+            
+            <Button x:Name="btnBilling" Content="Billing" 
+                    Style="{StaticResource MenuButtonStyle}"
+                    Click="btnBilling_Click">
+                <Button.ContentTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE8C9;" FontFamily="Segoe MDL2 Assets" Margin="0,0,10,0"/>
+                            <TextBlock Text="Billing"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </Button.ContentTemplate>
+            </Button>
+            
+            <Button x:Name="btnReports" Content="Reports" 
+                    Style="{StaticResource MenuButtonStyle}"
+                    Click="btnReports_Click">
+                <Button.ContentTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE9F9;" FontFamily="Segoe MDL2 Assets" Margin="0,0,10,0"/>
+                            <TextBlock Text="Reports"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </Button.ContentTemplate>
+            </Button>
+        </StackPanel>
+
+        <!-- Main Content Area -->
+        <Frame Grid.Column="1" x:Name="MainFrame" 
+               NavigationUIVisibility="Hidden"
+               Background="#f5f6fa"/>
+    </Grid>
+</Window> 
