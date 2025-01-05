@@ -59,30 +59,48 @@ namespace Hospital_magnment_system.Views
                 using (var conn = DatabaseConnection.GetConnection())
                 {
                     conn.Open();
-                    string query = "SELECT * FROM Rooms WHERE 1=1";
+                    string query = @"SELECT RoomID, 
+                                   RoomNumber,
+                                   RoomType,
+                                   Floor,
+                                   Status,
+                                   RatePerDay
+                                   FROM Rooms 
+                                   WHERE 1=1";
 
                     if (cmbRoomType.SelectedIndex > 0)
+                    {
                         query += " AND RoomType = @RoomType";
+                    }
                     if (cmbStatus.SelectedIndex > 0)
+                    {
                         query += " AND Status = @Status";
-                    if (cmbFloor.SelectedIndex > 0)
+                    }
+                    if (cmbFloor.SelectedValue != null && cmbFloor.SelectedValue != DBNull.Value)
+                    {
                         query += " AND Floor = @Floor";
+                    }
 
-                    query += " ORDER BY RoomNumber";
+                    using (var cmd = new MySqlCommand(query, conn))
+                    {
+                        if (cmbRoomType.SelectedIndex > 0)
+                        {
+                            cmd.Parameters.AddWithValue("@RoomType", ((ComboBoxItem)cmbRoomType.SelectedItem).Content.ToString());
+                        }
+                        if (cmbStatus.SelectedIndex > 0)
+                        {
+                            cmd.Parameters.AddWithValue("@Status", ((ComboBoxItem)cmbStatus.SelectedItem).Content.ToString());
+                        }
+                        if (cmbFloor.SelectedValue != null && cmbFloor.SelectedValue != DBNull.Value)
+                        {
+                            cmd.Parameters.AddWithValue("@Floor", cmbFloor.SelectedValue);
+                        }
 
-                    MySqlCommand cmd = new MySqlCommand(query, conn);
-
-                    if (cmbRoomType.SelectedIndex > 0)
-                        cmd.Parameters.AddWithValue("@RoomType", ((ComboBoxItem)cmbRoomType.SelectedItem).Content.ToString());
-                    if (cmbStatus.SelectedIndex > 0)
-                        cmd.Parameters.AddWithValue("@Status", ((ComboBoxItem)cmbStatus.SelectedItem).Content.ToString());
-                    if (cmbFloor.SelectedIndex > 0)
-                        cmd.Parameters.AddWithValue("@Floor", cmbFloor.SelectedValue);
-
-                    MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
-                    DataTable dt = new DataTable();
-                    adapter.Fill(dt);
-                    dgRooms.ItemsSource = dt.DefaultView;
+                        MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
+                        DataTable dt = new DataTable();
+                        adapter.Fill(dt);
+                        dgRooms.ItemsSource = dt.DefaultView;
+                    }
                 }
             }
             catch (Exception ex)
@@ -100,34 +118,41 @@ namespace Hospital_magnment_system.Views
                     conn.Open();
                     string query = @"SELECT 
                                    CONCAT(p.FirstName, ' ', p.LastName) as PatientName,
-                                   CONCAT(d.FirstName, ' ', d.LastName) as DoctorName,
                                    ra.AdmissionDate,
+                                   CONCAT(d.FirstName, ' ', d.LastName) as DoctorName,
                                    DATEDIFF(CURRENT_DATE, ra.AdmissionDate) as TotalDays,
-                                   r.PricePerDay * DATEDIFF(CURRENT_DATE, ra.AdmissionDate) as CurrentCharges
-                                   FROM RoomAllocations ra
-                                   JOIN Patients p ON ra.PatientID = p.PatientID
-                                   JOIN Doctors d ON ra.DoctorID = d.DoctorID
-                                   JOIN Rooms r ON ra.RoomID = r.RoomID
-                                   WHERE ra.RoomID = @RoomID
-                                   AND ra.Status = 'Active'";
+                                   r.RatePerDay,
+                                   DATEDIFF(CURRENT_DATE, ra.AdmissionDate) * r.RatePerDay as CurrentCharges
+                                   FROM Rooms r
+                                   LEFT JOIN RoomAllocations ra ON r.RoomID = ra.RoomID AND ra.Status = 'Active'
+                                   LEFT JOIN Patients p ON ra.PatientID = p.PatientID
+                                   LEFT JOIN Doctors d ON ra.DoctorID = d.DoctorID
+                                   WHERE r.RoomID = @RoomID";
 
-                    MySqlCommand cmd = new MySqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@RoomID", room["RoomID"]);
-
-                    using (var reader = cmd.ExecuteReader())
+                    using (var cmd = new MySqlCommand(query, conn))
                     {
-                        if (reader.Read())
+                        cmd.Parameters.AddWithValue("@RoomID", room["RoomID"]);
+                        using (var reader = cmd.ExecuteReader())
                         {
-                            txtCurrentPatient.Text = reader["PatientName"].ToString();
-                            txtAttendingDoctor.Text = reader["DoctorName"].ToString();
-                            txtAdmissionDate.Text = Convert.ToDateTime(reader["AdmissionDate"]).ToString("dd/MM/yyyy");
-                            txtTotalDays.Text = reader["TotalDays"].ToString() + " days";
-                            txtCurrentCharges.Text = string.Format("{0:C2}", reader["CurrentCharges"]);
-                            btnDischarge.Visibility = Visibility.Visible;
-                        }
-                        else
-                        {
-                            ClearRoomDetails();
+                            if (reader.Read())
+                            {
+                                txtCurrentPatient.Text = reader["PatientName"].ToString() ?? "No patient";
+                                txtAdmissionDate.Text = reader["AdmissionDate"] != DBNull.Value ? 
+                                    Convert.ToDateTime(reader["AdmissionDate"]).ToString("dd/MM/yyyy") : "-";
+                                txtAttendingDoctor.Text = reader["DoctorName"]?.ToString() ?? "-";
+                                txtTotalDays.Text = reader["TotalDays"] != DBNull.Value ? 
+                                    reader["TotalDays"].ToString() : "0";
+                                txtCurrentCharges.Text = reader["CurrentCharges"] != DBNull.Value ? 
+                                    string.Format("{0:C2}", reader["CurrentCharges"]) : "$0.00";
+
+                                // Show discharge button only if there's an active patient
+                                btnDischarge.Visibility = !string.IsNullOrEmpty(reader["PatientName"]?.ToString()) ? 
+                                    Visibility.Visible : Visibility.Collapsed;
+                            }
+                            else
+                            {
+                                ClearRoomDetails();
+                            }
                         }
                     }
                 }
@@ -135,16 +160,17 @@ namespace Hospital_magnment_system.Views
             catch (Exception ex)
             {
                 MessageBox.Show("Error loading room details: " + ex.Message);
+                ClearRoomDetails();
             }
         }
 
         private void ClearRoomDetails()
         {
             txtCurrentPatient.Text = "No patient";
-            txtAttendingDoctor.Text = "-";
             txtAdmissionDate.Text = "-";
-            txtTotalDays.Text = "-";
-            txtCurrentCharges.Text = "-";
+            txtAttendingDoctor.Text = "-";
+            txtTotalDays.Text = "0";
+            txtCurrentCharges.Text = "$0.00";
             btnDischarge.Visibility = Visibility.Collapsed;
         }
 
@@ -254,6 +280,32 @@ namespace Hospital_magnment_system.Views
                         MessageBox.Show("Error discharging patient: " + ex.Message);
                     }
                 }
+            }
+        }
+
+        private void btnAssign_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var selectedRoom = ((FrameworkElement)sender).DataContext as DataRowView;
+                if (selectedRoom != null)
+                {
+                    if (selectedRoom["Status"].ToString() != "Available")
+                    {
+                        MessageBox.Show("Only available rooms can be assigned to patients.");
+                        return;
+                    }
+
+                    var assignWindow = new AssignPatientWindow(selectedRoom);
+                    if (assignWindow.ShowDialog() == true)
+                    {
+                        LoadRooms();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error assigning room: " + ex.Message);
             }
         }
     }
