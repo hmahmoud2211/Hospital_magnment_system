@@ -32,8 +32,7 @@ namespace Hospital_magnment_system.Views
             Title = "Edit Room";
             txtRoomNumber.Text = _roomToEdit["RoomNumber"].ToString();
             txtFloor.Text = _roomToEdit["Floor"].ToString();
-            txtPricePerDay.Text = _roomToEdit["PricePerDay"].ToString();
-            txtDescription.Text = _roomToEdit["Description"].ToString();
+            txtRatePerDay.Text = _roomToEdit["RatePerDay"].ToString();
 
             // Set Room Type
             foreach (ComboBoxItem item in cmbRoomType.Items)
@@ -61,9 +60,9 @@ namespace Hospital_magnment_system.Views
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            if (ValidateInput())
+            try
             {
-                try
+                if (ValidateInput())
                 {
                     using (var conn = DatabaseConnection.GetConnection())
                     {
@@ -73,12 +72,11 @@ namespace Hospital_magnment_system.Views
 
                         if (_isEditMode)
                         {
-                            query = @"UPDATE Rooms SET 
-                                    RoomType = @RoomType,
-                                    Floor = @Floor,
-                                    PricePerDay = @PricePerDay,
-                                    Status = @Status,
-                                    Description = @Description
+                            query = @"UPDATE Rooms 
+                                    SET RoomType = @RoomType,
+                                        Floor = @Floor,
+                                        Status = @Status,
+                                        RatePerDay = @RatePerDay
                                     WHERE RoomID = @RoomID";
 
                             cmd = new MySqlCommand(query, conn);
@@ -87,9 +85,9 @@ namespace Hospital_magnment_system.Views
                         else
                         {
                             query = @"INSERT INTO Rooms 
-                                    (RoomNumber, RoomType, Floor, PricePerDay, Status, Description)
+                                    (RoomNumber, RoomType, Floor, Status, RatePerDay)
                                     VALUES 
-                                    (@RoomNumber, @RoomType, @Floor, @PricePerDay, @Status, @Description)";
+                                    (@RoomNumber, @RoomType, @Floor, @Status, @RatePerDay)";
 
                             cmd = new MySqlCommand(query, conn);
                             cmd.Parameters.AddWithValue("@RoomNumber", txtRoomNumber.Text);
@@ -97,19 +95,18 @@ namespace Hospital_magnment_system.Views
 
                         cmd.Parameters.AddWithValue("@RoomType", ((ComboBoxItem)cmbRoomType.SelectedItem).Content.ToString());
                         cmd.Parameters.AddWithValue("@Floor", int.Parse(txtFloor.Text));
-                        cmd.Parameters.AddWithValue("@PricePerDay", decimal.Parse(txtPricePerDay.Text));
                         cmd.Parameters.AddWithValue("@Status", ((ComboBoxItem)cmbStatus.SelectedItem).Content.ToString());
-                        cmd.Parameters.AddWithValue("@Description", txtDescription.Text);
+                        cmd.Parameters.AddWithValue("@RatePerDay", decimal.Parse(txtRatePerDay.Text));
 
                         cmd.ExecuteNonQuery();
                         DialogResult = true;
                         Close();
                     }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error saving room: " + ex.Message);
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error saving room: " + ex.Message);
             }
         }
 
@@ -125,9 +122,9 @@ namespace Hospital_magnment_system.Views
                 MessageBox.Show("Please enter a valid Floor number");
                 return false;
             }
-            if (string.IsNullOrWhiteSpace(txtPricePerDay.Text) || !decimal.TryParse(txtPricePerDay.Text, out _))
+            if (string.IsNullOrWhiteSpace(txtRatePerDay.Text) || !decimal.TryParse(txtRatePerDay.Text, out _))
             {
-                MessageBox.Show("Please enter a valid Price per Day");
+                MessageBox.Show("Please enter a valid Rate per Day");
                 return false;
             }
             return true;

@@ -28,8 +28,8 @@
             <TextBlock Text="Floor"/>
             <TextBox x:Name="txtFloor" Margin="0,5,0,10"/>
 
-            <TextBlock Text="Price per Day"/>
-            <TextBox x:Name="txtPricePerDay" Margin="0,5,0,10"/>
+            <TextBlock Text="Rate per Day"/>
+            <TextBox x:Name="txtRatePerDay" Margin="0,5,0,10"/>
 
             <TextBlock Text="Status"/>
             <ComboBox x:Name="cmbStatus" Margin="0,5,0,10">

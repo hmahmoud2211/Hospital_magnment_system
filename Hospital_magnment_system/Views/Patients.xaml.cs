@@ -67,17 +67,14 @@ namespace Hospital_magnment_system.Views
         {
             try
             {
-                var selectedPatient = dgPatients.SelectedItem as DataRowView;
-                if (selectedPatient == null)
+                var selectedPatient = ((FrameworkElement)sender).DataContext as DataRowView;
+                if (selectedPatient != null)
                 {
-                    MessageBox.Show("Please select a patient to edit");
-                    return;
-                }
-
-                var editPatientWindow = new EditPatientWindow(selectedPatient);
-                if (editPatientWindow.ShowDialog() == true)
-                {
-                    LoadPatients(); // Refresh the grid
+                    var editWindow = new EditPatientWindow(selectedPatient);
+                    if (editWindow.ShowDialog() == true)
+                    {
+                        LoadPatients(); // Refresh the grid after successful edit
+                    }
                 }
             }
             catch (Exception ex)
